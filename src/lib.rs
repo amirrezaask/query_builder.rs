@@ -1,66 +1,7 @@
 use proc_macro::{bridge::server::Span, TokenStream};
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput};
-// const (
-// 	ClauseType_Where         = "WHERE"
-// 	ClauseType_Limit         = "LIMIT"
-// 	ClauseType_Offset        = "OFFSET"
-// 	ClauseType_OrderBy       = "ORDER BY"
-// 	ClauseType_GroupBy       = "GROUP BY"
-// 	ClauseType_InnerJoin     = "INNER JOIN"
-// 	ClauseType_LeftJoin      = "LEFT JOIN"
-// 	ClauseType_RightJoin     = "RIGHT JOIN"
-// 	ClauseType_FullOuterJoin = "FULL OUTER JOIN"
-// 	ClauseType_Select        = "SELECT"
-// 	ClauseType_Having        = "HAVING"
-// )
-enum ClauseType {
-    Where,
-    Limit,
-    Offset,
-    OrderBy,
-    GroupBy,
-    InnerJoin,
-    RightJoin,
-    LeftJoin,
-    FullOuterJoin,
-    Select,
-    Having,
-}
-
-impl std::fmt::Display for ClauseType {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            ClauseType::Where => write!(f, "WHERE"),
-            ClauseType::Limit => write!(f, "LIMIT"),
-            ClauseType::Offset => write!(f, "OFFSET"),
-            ClauseType::OrderBy => write!(f, "ORDER BY"),
-            ClauseType::GroupBy => write!(f, "GROUP BY"),
-            ClauseType::InnerJoin => write!(f, "INNER JOIN"),
-            ClauseType::RightJoin => write!(f, "RIGHT JOIN"),
-            ClauseType::LeftJoin => write!(f, "LEFT JOIN"),
-            ClauseType::FullOuterJoin => write!(f, "FULL OUTER JOIN"),
-            ClauseType::Select => write!(f, "SELECT"),
-            ClauseType::Having => write!(f, "HAVING"),
-        }
-    }
-}
-struct Clause {
-    ty: ClauseType,
-    arg: Vec<String>,
-    delimiter: String,
-}
-
-impl std::fmt::Display for Clause {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.delimiter == "" {
-            self.delimiter = " ".to_string();
-        }
-        write!(f, "{} {}", self.ty, self.arg.join(&self.delimiter))
-    }
-}
-struct BaseQueryBuilder {}
-
+mod base;
 fn is_option(wrapper: String, ty: &syn::Type) -> bool {
     if let syn::Type::Path(syn::TypePath {
         path: syn::Path { segments, .. },
