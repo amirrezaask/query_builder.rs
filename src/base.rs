@@ -43,8 +43,9 @@ impl std::fmt::Display for Clause {
         write!(f, "{} {}", self.ty, self.arg.join(&self.delimiter))
     }
 }
-struct SelectStmt {
-    table: String,
+#[derive(Default)]
+struct SelectBuilder {
+    table: Option<String>,
     selected: Option<Clause>,
     _where: Option<Clause>,
     order_by: Option<Clause>,
@@ -55,7 +56,7 @@ struct SelectStmt {
     having: Option<Clause>,
 }
 
-impl SelectStmt {
+impl SelectBuilder {
     pub fn limit(&mut self, n: usize) -> &mut Self {
         self.limit = Some(Clause {
             ty: ClauseType::Limit,
@@ -182,7 +183,90 @@ impl SelectStmt {
         self
     }
     pub fn table(&mut self, t: String) -> &mut Self {
-        self.table = t;
+        self.table = Some(t);
         self
+    }
+    pub fn _where(&mut self, cond: String) -> &mut Self {
+        if self._where.is_none() {
+            self._where = Some(Clause {
+                ty: ClauseType::Where,
+                arg: vec![cond],
+                delimiter: "".to_string(),
+            });
+            return self;
+        }
+        self._where.unwrap().arg.push("AND".to_string());
+        self.selected.unwrap().arg.push(cond);
+        self
+    }
+    pub fn and_where(&mut self, cond: String) -> &mut Self {
+        self._where(cond)
+    }
+    pub fn or_where(&mut self, cond: String) -> &mut Self {
+        if self._where.is_none() {
+            self._where = Some(Clause {
+                ty: ClauseType::Where,
+                arg: vec![cond],
+                delimiter: "".to_string(),
+            });
+            return self;
+        }
+        self._where.unwrap().arg.push("OR".to_string());
+        self.selected.unwrap().arg.push(cond);
+        self
+    }
+    pub fn build(&self) -> String {
+        let sections: Vec<String> = Vec::new();
+
+        if self.selected.is_none() {
+            self.selected = Some(Clause {
+                ty: ClauseType::Select,
+                arg: vec!["*".to_string()],
+                delimiter: "".to_string(),
+            });
+        }
+
+        sections.push(self.selected.unwrap().to_string());
+
+        if self.table.is_none() {
+            panic!("table cannot be none");
+        }
+
+        sections.push(format!("FROM {}", self.table.unwrap()));
+
+        if self._where.is_some() {
+            sections.push(self._where.unwrap().to_string());
+        }
+
+        if self.order_by.is_some() {
+            sections.push(self.order_by.unwrap().to_string());
+        }
+
+        if self.group_by.is_some() {
+            sections.push(self.group_by.unwrap().to_string());
+        }
+
+        if self.joins.is_some() {
+            for j in self.joins.unwrap() {
+                sections.push(j.to_string());
+            }
+        }
+
+        if self.limit.is_some() {
+            sections.push(self.limit.unwrap().to_string());
+        }
+
+        if self.offset.is_some() {
+            sections.push(self.offset.unwrap().to_string());
+        }
+
+        if self.having.is_some() {
+            sections.push(self.having.unwrap().to_string());
+        }
+        return "".to_string();
+    }
+
+    pub fn new() -> Self {
+        Self::default()
     }
 }
