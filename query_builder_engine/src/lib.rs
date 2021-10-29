@@ -37,14 +37,15 @@ struct Clause {
 
 impl std::fmt::Display for Clause {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.delimiter == "" {
-            self.delimiter = " ".to_string();
+        let mut delim = self.delimiter.clone();
+        if delim == "" {
+            delim = " ".to_string();
         }
-        write!(f, "{} {}", self.ty, self.arg.join(&self.delimiter))
+        write!(f, "{} {}", self.ty, self.arg.join(&delim))
     }
 }
 #[derive(Default)]
-struct SelectBuilder {
+pub struct SelectBuilder {
     table: Option<String>,
     selected: Option<Clause>,
     _where: Option<Clause>,
@@ -84,7 +85,7 @@ impl SelectBuilder {
         if self.joins.is_none() {
             self.joins = Some(Vec::new());
         }
-        self.joins.unwrap().push(Clause {
+        self.joins.as_mut().unwrap().push(Clause {
             ty: ClauseType::InnerJoin,
             arg: args,
             delimiter: "".to_string(),
@@ -96,7 +97,7 @@ impl SelectBuilder {
         if self.joins.is_none() {
             self.joins = Some(Vec::new());
         }
-        self.joins.unwrap().push(Clause {
+        self.joins.as_mut().unwrap().push(Clause {
             ty: ClauseType::LeftJoin,
             arg: args,
             delimiter: "".to_string(),
@@ -108,7 +109,7 @@ impl SelectBuilder {
         if self.joins.is_none() {
             self.joins = Some(Vec::new());
         }
-        self.joins.unwrap().push(Clause {
+        self.joins.as_mut().unwrap().push(Clause {
             ty: ClauseType::RightJoin,
             arg: args,
             delimiter: "".to_string(),
@@ -120,7 +121,7 @@ impl SelectBuilder {
         if self.joins.is_none() {
             self.joins = Some(Vec::new());
         }
-        self.joins.unwrap().push(Clause {
+        self.joins.as_mut().unwrap().push(Clause {
             ty: ClauseType::FullOuterJoin,
             arg: args,
             delimiter: "".to_string(),
@@ -137,6 +138,7 @@ impl SelectBuilder {
             return self;
         }
         self.order_by
+            .as_mut()
             .unwrap()
             .arg
             .push(format!("{} {}", col, order));
@@ -151,8 +153,8 @@ impl SelectBuilder {
             });
             return self;
         }
-        self.having.unwrap().arg.push("AND".to_string());
-        self.having.unwrap().arg.push(cond);
+        self.having.as_mut().unwrap().arg.push("AND".to_string());
+        self.having.as_mut().unwrap().arg.push(cond);
 
         self
     }
@@ -167,7 +169,7 @@ impl SelectBuilder {
             return self;
         }
 
-        self.selected.unwrap().arg.push(cols.join(""));
+        self.selected.as_mut().unwrap().arg.push(cols.join(""));
         self
     }
     pub fn distinct(&mut self) -> &mut Self {
@@ -179,7 +181,11 @@ impl SelectBuilder {
             });
             return self;
         }
-        self.selected.unwrap().arg.insert(0, "DISTINCT".to_string());
+        self.selected
+            .as_mut()
+            .unwrap()
+            .arg
+            .insert(0, "DISTINCT".to_string());
         self
     }
     pub fn table(&mut self, t: String) -> &mut Self {
@@ -195,8 +201,8 @@ impl SelectBuilder {
             });
             return self;
         }
-        self._where.unwrap().arg.push("AND".to_string());
-        self.selected.unwrap().arg.push(cond);
+        self._where.as_mut().unwrap().arg.push("AND".to_string());
+        self.selected.as_mut().unwrap().arg.push(cond);
         self
     }
     pub fn and_where(&mut self, cond: String) -> &mut Self {
@@ -211,12 +217,12 @@ impl SelectBuilder {
             });
             return self;
         }
-        self._where.unwrap().arg.push("OR".to_string());
-        self.selected.unwrap().arg.push(cond);
+        self._where.as_mut().unwrap().arg.push("OR".to_string());
+        self.selected.as_mut().unwrap().arg.push(cond);
         self
     }
-    pub fn build(&self) -> String {
-        let sections: Vec<String> = Vec::new();
+    pub fn build(&mut self) -> String {
+        let mut sections: Vec<String> = Vec::new();
 
         if self.selected.is_none() {
             self.selected = Some(Clause {
@@ -226,42 +232,42 @@ impl SelectBuilder {
             });
         }
 
-        sections.push(self.selected.unwrap().to_string());
+        sections.push(self.selected.as_ref().unwrap().to_string());
 
         if self.table.is_none() {
             panic!("table cannot be none");
         }
 
-        sections.push(format!("FROM {}", self.table.unwrap()));
+        sections.push(format!("FROM {}", self.table.as_ref().unwrap()));
 
         if self._where.is_some() {
-            sections.push(self._where.unwrap().to_string());
+            sections.push(self._where.as_ref().unwrap().to_string());
         }
 
         if self.order_by.is_some() {
-            sections.push(self.order_by.unwrap().to_string());
+            sections.push(self.order_by.as_ref().unwrap().to_string());
         }
 
         if self.group_by.is_some() {
-            sections.push(self.group_by.unwrap().to_string());
+            sections.push(self.group_by.as_ref().unwrap().to_string());
         }
 
         if self.joins.is_some() {
-            for j in self.joins.unwrap() {
+            for j in self.joins.as_ref().unwrap() {
                 sections.push(j.to_string());
             }
         }
 
         if self.limit.is_some() {
-            sections.push(self.limit.unwrap().to_string());
+            sections.push(self.limit.as_ref().unwrap().to_string());
         }
 
         if self.offset.is_some() {
-            sections.push(self.offset.unwrap().to_string());
+            sections.push(self.offset.as_ref().unwrap().to_string());
         }
 
         if self.having.is_some() {
-            sections.push(self.having.unwrap().to_string());
+            sections.push(self.having.as_ref().unwrap().to_string());
         }
         return "".to_string();
     }

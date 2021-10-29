@@ -1,4 +1,4 @@
-use query_builder::QueryBuilder;
+use query_builder_macros::QueryBuilder;
 
 struct Address(String);
 
@@ -12,10 +12,7 @@ struct User {
 
 #[test]
 fn make_methods() {
-    User::query()
-        .where_name()
-        .where_age_le()
-        .has_email()
-        .with_addresses()
-        .build()
+    let mut usb = UserSelectBuilder::new();
+    let q = usb.where_name_eq("a".to_string()).build();
+    assert_eq!(q, "")
 }

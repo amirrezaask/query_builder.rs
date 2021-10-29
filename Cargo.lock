@@ -39,6 +39,18 @@ dependencies = [
 name = "query_builder"
 version = "0.1.0"
 dependencies = [
+ "query_builder_engine",
+ "query_builder_macros",
+]
+
+[[package]]
+name = "query_builder_engine"
+version = "0.1.0"
+
+[[package]]
+name = "query_builder_macros"
+version = "0.1.0"
+dependencies = [
  "quote",
  "syn",
  "trybuild",
