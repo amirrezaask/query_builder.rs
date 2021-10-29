@@ -79,7 +79,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
             format!("where_{}_eq", (&f.ident).as_ref().unwrap()).as_str(),
             f.span(),
         );
-        let ty = &f.ty;
+        let ty = extract_inner(f.ty.clone());
         let cond = format!("{}={{}}", (&f.ident).as_ref().unwrap());
         quote! {
             pub fn #eq_ident(&mut self, arg: #ty) -> &mut Self {
@@ -90,7 +90,8 @@ pub fn derive(input: TokenStream) -> TokenStream {
     });
 
     let comparisons = fields.iter().filter_map(|f| {
-        if !is_numeric(&f.ty) {
+        let inner_ty = extract_inner(f.ty.clone());
+        if !is_numeric(&inner_ty) {
             return None;
         }
         let le_ident = syn::Ident::new(
@@ -112,7 +113,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
             format!("where_{}_lt", (&f.ident).as_ref().unwrap()).as_str(),
             f.span(),
         );
-        let ty = &f.ty;
+        let ty = extract_inner(f.ty.clone());
         let le_cond = format!("{}<={{}}", (&f.ident).as_ref().unwrap());
         let ge_cond = format!("{}>={{}}", (&f.ident).as_ref().unwrap());
         let gt_cond = format!("{}>{{}}", (&f.ident).as_ref().unwrap());

@@ -7,6 +7,7 @@ struct User {
     name: String,
     age: i32,
     email: Option<String>,
+    score: Option<i32>,
     // Addresses: Vec<Address>,
 }
 
@@ -35,14 +36,14 @@ fn where_null_and_not_null() {
             .table("users".to_string())
             .where_email_null()
             .build(),
-        "SELECT * FROM users WHERE name=a"
+        "SELECT * FROM users WHERE email is NULL"
     );
     assert_eq!(
         UserSelectBuilder::new()
             .table("users".to_string())
             .where_email_not_null()
             .build(),
-        "SELECT * FROM users WHERE age=10"
+        "SELECT * FROM users WHERE email is NOT NULL"
     );
 }
 #[test]
@@ -75,4 +76,12 @@ fn where_cmp() {
             .build(),
         "SELECT * FROM users WHERE age<19"
     );
+
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_score_gt(19)
+            .build(),
+        "SELECT * FROM users WHERE score>19"
+    )
 }
