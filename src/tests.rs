@@ -6,7 +6,7 @@ struct Address(String);
 struct User {
     name: String,
     age: i32,
-    // email: Option<String>,
+    email: Option<String>,
     // Addresses: Vec<Address>,
 }
 
@@ -25,5 +25,54 @@ fn where_eq() {
             .where_age_eq(10)
             .build(),
         "SELECT * FROM users WHERE age=10"
+    );
+}
+
+#[test]
+fn where_null_and_not_null() {
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_email_null()
+            .build(),
+        "SELECT * FROM users WHERE name=a"
+    );
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_email_not_null()
+            .build(),
+        "SELECT * FROM users WHERE age=10"
+    );
+}
+#[test]
+fn where_cmp() {
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_age_le(19)
+            .build(),
+        "SELECT * FROM users WHERE age<=19"
+    );
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_age_ge(19)
+            .build(),
+        "SELECT * FROM users WHERE age>=19"
+    );
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_age_gt(19)
+            .build(),
+        "SELECT * FROM users WHERE age>19"
+    );
+    assert_eq!(
+        UserSelectBuilder::new()
+            .table("users".to_string())
+            .where_age_lt(19)
+            .build(),
+        "SELECT * FROM users WHERE age<19"
     );
 }
