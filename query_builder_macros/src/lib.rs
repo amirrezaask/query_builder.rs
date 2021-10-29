@@ -61,6 +61,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let name = &ast.ident;
     let select_builder_name = format!("{}SelectBuilder", &ast.ident);
     let model_ident = name;
+    let table_name = format!("\"{}s\"", model_ident.to_string());
     let select_builder_ident = syn::Ident::new(&select_builder_name, name.span());
     let fields = {
         if let syn::Data::Struct(syn::DataStruct {
@@ -73,22 +74,18 @@ pub fn derive(input: TokenStream) -> TokenStream {
             unimplemented!()
         }
     };
-    let wheres = fields.iter().map(|f| {
-        if is_ty("String".to_string(), &f.ty) {
-            let eq_ident = syn::Ident::new(
-                format!("where_{}_eq", (&f.ident).as_ref().unwrap()).as_str(),
-                f.span(),
-            );
-            let ty = &f.ty;
-            let cond = format!("{}={{}}", (&f.ident).as_ref().unwrap());
-            quote! {
-                pub fn #eq_ident(&mut self, arg: #ty) -> &mut Self {
-                    self.builder._where(format!(#cond, arg));
-                    self
-                }
+    let eqs = fields.iter().map(|f| {
+        let eq_ident = syn::Ident::new(
+            format!("where_{}_eq", (&f.ident).as_ref().unwrap()).as_str(),
+            f.span(),
+        );
+        let ty = &f.ty;
+        let cond = format!("{}={{}}", (&f.ident).as_ref().unwrap());
+        quote! {
+            pub fn #eq_ident(&mut self, arg: #ty) -> &mut Self {
+                self.builder._where(format!(#cond, arg));
+                self
             }
-        } else {
-            quote! {/* */}
         }
     });
 
@@ -101,14 +98,19 @@ pub fn derive(input: TokenStream) -> TokenStream {
         struct #select_builder_ident {
             builder: query_builder_engine::SelectBuilder
         }
+
         impl #select_builder_ident {
-            #(#wheres)*
+            #(#eqs)*
             pub fn build(&mut self) -> String {
                 self.builder.build()
             }
+            pub fn table(&mut self, t: String) -> &mut Self {
+                self.builder.table(t);
+                self
+            }
             pub fn new() -> Self {
                 #select_builder_ident {
-                builder: query_builder_engine::SelectBuilder::new()
+                    builder: query_builder_engine::SelectBuilder::new()
                 }
             }
         }

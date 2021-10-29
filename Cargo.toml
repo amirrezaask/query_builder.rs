@@ -3,6 +3,10 @@ name = "query_builder"
 version = "0.1.0"
 edition = "2018"
 
+[[test]]
+name = "tests"
+path = "src/tests.rs"
+
 [workspace]
 
 [dependencies.query_builder_engine]

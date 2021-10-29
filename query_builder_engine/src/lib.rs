@@ -269,10 +269,12 @@ impl SelectBuilder {
         if self.having.is_some() {
             sections.push(self.having.as_ref().unwrap().to_string());
         }
-        return "".to_string();
+        sections.join(" ")
     }
 
     pub fn new() -> Self {
-        Self::default()
+        let mut s = Self::default();
+
+        s
     }
 }
