@@ -15,6 +15,7 @@ For each struct field following methods will be generated.
 - where_FIELDNAME_not_null
 
 ### Relation attributes [TBA]
+```rust
 struct User {
     name: String,
     age: i32,
@@ -23,4 +24,5 @@ struct User {
     #[join("addresses", left)]
     Addresses: Vec<Address>,
 }
+```
 *join attribute*: (table_name, left|right|inner|full_outer)
