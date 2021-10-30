@@ -2,7 +2,7 @@ use query_builder_macros::QueryBuilder;
 
 struct Address(String);
 
-#[derive(QueryBuilder, Bindable)]
+#[derive(QueryBuilder)]
 struct User {
     name: String,
     age: i32,
