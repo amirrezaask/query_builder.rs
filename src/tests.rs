@@ -2,23 +2,32 @@ use query_builder_macros::QueryBuilder;
 
 struct Address(String);
 
-#[derive(QueryBuilder)]
+#[derive(QueryBuilder, Bindable)]
 struct User {
     name: String,
     age: i32,
     email: Option<String>,
     score: Option<i32>,
+    // #[join("addresses", left)]
     // Addresses: Vec<Address>,
 }
-
+// #[test]
+// fn relation() {
+//     assert_eq!(
+//         UserSelectBuilder::new()
+//             .table("users".to_string())
+//             .load_addresses("id", "id")
+//             .build(),
+//         "SELECT * FROM users LEFT JOIN addresses ON users.id = addresses.user_id"
+//     );
+// }
 #[test]
 fn where_eq() {
-    assert_eq!(
+    UserSelectBuilder::new().builder._where_in(
         UserSelectBuilder::new()
             .table("users".to_string())
             .where_name_eq("a".to_string())
             .build(),
-        "SELECT * FROM users WHERE name=a"
     );
     assert_eq!(
         UserSelectBuilder::new()
