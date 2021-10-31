@@ -61,7 +61,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let name = &ast.ident;
     let select_builder_name = format!("{}SelectBuilder", &ast.ident);
     let model_ident = name;
-    let table_name = format!("\"{}s\"", model_ident.to_string());
+    let table_name = format!("{}s", model_ident.to_string().to_lowercase());
     let select_builder_ident = syn::Ident::new(&select_builder_name, name.span());
     let fields = {
         if let syn::Data::Struct(syn::DataStruct {
@@ -168,7 +168,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     });
     let query_builder = quote! {
         impl #model_ident {
-            pub fn select(&mut self) -> #select_builder_ident {
+            pub fn select() -> #select_builder_ident {
                 return #select_builder_ident::new();
             }
         }
@@ -188,8 +188,10 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 self
             }
             pub fn new() -> Self {
+                let mut builder = query_builder_engine::SelectBuilder::new();
+                builder.table(#table_name.to_string());
                 #select_builder_ident {
-                    builder: query_builder_engine::SelectBuilder::new()
+                    builder: builder
                 }
             }
         }

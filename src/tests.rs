@@ -23,17 +23,8 @@ struct User {
 // }
 #[test]
 fn where_eq() {
-    UserSelectBuilder::new().builder._where_in(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_name_eq("a".to_string())
-            .build(),
-    );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_age_eq(10)
-            .build(),
+        User::select().where_age_eq(10).build(),
         "SELECT * FROM users WHERE age=10"
     );
 }
@@ -41,53 +32,34 @@ fn where_eq() {
 #[test]
 fn where_null_and_not_null() {
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_email_null()
-            .build(),
+        UserSelectBuilder::new().where_email_null().build(),
         "SELECT * FROM users WHERE email is NULL"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_email_not_null()
-            .build(),
+        UserSelectBuilder::new().where_email_not_null().build(),
         "SELECT * FROM users WHERE email is NOT NULL"
     );
 }
 #[test]
 fn where_option_inner_should_be_extracted() {
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_score_gt(19)
-            .build(),
+        UserSelectBuilder::new().where_score_gt(19).build(),
         "SELECT * FROM users WHERE score>19"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_score_lt(19)
-            .build(),
+        UserSelectBuilder::new().where_score_lt(19).build(),
         "SELECT * FROM users WHERE score<19"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_score_ge(19)
-            .build(),
+        UserSelectBuilder::new().where_score_ge(19).build(),
         "SELECT * FROM users WHERE score>=19"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_score_le(19)
-            .build(),
+        UserSelectBuilder::new().where_score_le(19).build(),
         "SELECT * FROM users WHERE score<=19"
     );
     assert_eq!(
         UserSelectBuilder::new()
-            .table("users".to_string())
             .where_email_eq(String::from("email"))
             .build(),
         "SELECT * FROM users WHERE email=email"
@@ -97,31 +69,19 @@ fn where_option_inner_should_be_extracted() {
 #[test]
 fn where_cmp() {
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_age_le(19)
-            .build(),
+        UserSelectBuilder::new().where_age_le(19).build(),
         "SELECT * FROM users WHERE age<=19"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_age_ge(19)
-            .build(),
+        UserSelectBuilder::new().where_age_ge(19).build(),
         "SELECT * FROM users WHERE age>=19"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_age_gt(19)
-            .build(),
+        UserSelectBuilder::new().where_age_gt(19).build(),
         "SELECT * FROM users WHERE age>19"
     );
     assert_eq!(
-        UserSelectBuilder::new()
-            .table("users".to_string())
-            .where_age_lt(19)
-            .build(),
+        UserSelectBuilder::new().where_age_lt(19).build(),
         "SELECT * FROM users WHERE age<19"
     );
 }
