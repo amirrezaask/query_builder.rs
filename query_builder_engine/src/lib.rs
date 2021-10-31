@@ -202,7 +202,7 @@ impl SelectBuilder {
             return self;
         }
         self._where.as_mut().unwrap().arg.push("AND".to_string());
-        self.selected.as_mut().unwrap().arg.push(cond);
+        self._where.as_mut().unwrap().arg.push(cond);
         self
     }
     pub fn _where_in(&mut self, cond: String) -> &mut Self {

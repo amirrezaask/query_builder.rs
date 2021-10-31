@@ -28,6 +28,16 @@ fn where_eq() {
         "SELECT * FROM users WHERE age=10"
     );
 }
+#[test]
+fn misc() {
+    assert_eq!(
+        UserSelectBuilder::new()
+            .where_email_null()
+            .where_age_le(18)
+            .build(),
+        "SELECT * FROM users WHERE email is NULL AND age<=18"
+    )
+}
 
 #[test]
 fn where_null_and_not_null() {
