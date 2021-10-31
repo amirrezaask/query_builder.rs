@@ -20,9 +20,9 @@ for example
 
 ```rust
 UserSelectBuilder::new().where_email_null().where_age_le(18).build()
-
-
+// generates "SELECT * FROM users WHERE email is NULL AND age<=18"
 ```
+
 ### All fields
 - where_FIELDNAME_eq
 
